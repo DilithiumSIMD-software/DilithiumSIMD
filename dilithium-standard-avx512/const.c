@@ -1,0 +1,23 @@
+#include <stdint.h>
+#include "params.h"
+
+
+#if DILITHIUM_MODE == 2
+#define MASKSE 0X04040404
+const uint32_t _16xeta[16]  __attribute__((aligned(32))) = {ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA,ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA};
+const uint32_t _16xmasks[16]  __attribute__((aligned(32))) = {MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE,MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE};
+
+#elif DILITHIUM_MODE == 3
+#define MASKS11 0x201008
+#define MASKS12 0x1008
+const uint32_t _16xeta[16]  __attribute__((aligned(32))) = {ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA};
+const uint32_t _16xmasks11[16]  __attribute__((aligned(32))) = {MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11, MASKS11};
+const uint32_t _16xmasks12[16]  __attribute__((aligned(32))) = {MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12, MASKS12};
+
+#elif DILITHIUM_MODE == 5
+#define MASKSE 0X04040404
+#define MASKS2 0X040404
+const uint32_t _16xeta[16]  __attribute__((aligned(32))) = {ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA,ETA, ETA, ETA, ETA, ETA, ETA, ETA, ETA};
+const uint32_t _16xmasks[16]  __attribute__((aligned(32))) = {MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE,MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE, MASKSE};
+const uint32_t _16xmask2[16]  __attribute__((aligned(32))) = {MASKS2, MASKS2, MASKS2, MASKS2, MASKS2, MASKS2, MASKS2, MASKS2,MASKS2, MASKS2, MASKS2, MASKS2, MASKS2, MASKS2, MASKS2, MASKS2};
+#endif
