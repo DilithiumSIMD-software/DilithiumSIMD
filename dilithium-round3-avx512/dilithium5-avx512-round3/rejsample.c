@@ -46,46 +46,53 @@ unsigned int rej_uniform_avx(int32_t * restrict r, const uint8_t buf[REJ_UNIFORM
   return ctr;
 }
 
-#if ETA == 2
-unsigned int rej_eta_avx(int32_t * restrict r, const uint8_t buf[REJ_UNIFORM_ETA_BUFLEN]) {
+
+
+unsigned int rej_eta_avx(int32_t * restrict res, const uint8_t buf[REJ_UNIFORM_ETA_BUFLEN]) {
+  int16_t r[N];
   unsigned int ctr, pos;
-  __mmask16 good0, good1;
+  __mmask32 good0, good1;
   __m512i f0, f1, f2, f3, f4, f5;
-  const __m512i mask = _mm512_set1_epi32(15);
-  const __m512i eta = _mm512_set1_epi32(ETA);
+  const __m512i mask = _mm512_set1_epi16(15);
+   const __m512i eta = _mm512_set1_epi16(ETA);
   const __m512i bound = mask;
-  const __m512i idx16  = _mm512_set_epi32(15, 7, 14, 6,13, 5,12, 4,
-                                          11, 3, 10, 2, 9, 1, 8, 0);
-  const __m512i v = _mm512_set1_epi32(205);
-  const __m512i p = _mm512_set1_epi32(5);
+  const __m512i idx32  = _mm512_set_epi16(31, 15, 30, 14, 29, 13, 28, 12, 27, 11, 26, 10, 25, 9, 24, 8,
+                                          23, 7, 22, 6, 21, 5, 20, 4, 19, 3, 18, 2, 17, 1, 16, 0);
+  const __m512i v = _mm512_set1_epi16(205); 
+  const __m512i p = _mm512_set1_epi16(5);
   ctr = pos = 0;
-  while(ctr <= N - 32 && pos <= REJ_UNIFORM_ETA_BUFLEN - 16) {
-    f0 = _mm512_cvtepu8_epi32(_mm_loadu_si128((__m128i *)&buf[pos]));
-    f1 = _mm512_srai_epi32(f0,4);
+  while(ctr <= N - 64 && pos <= REJ_UNIFORM_ETA_BUFLEN - 32) {
+    f0 = _mm512_cvtepu8_epi16(_mm256_loadu_si256((__m256i *)&buf[pos]));
+
+    f1 = _mm512_srai_epi16(f0,4);
     f0 = _mm512_and_si512(f0,mask);
-    // to get the right order
-    shufflelo8_avx(&f4, &f0, &f1);
-    shufflehi8_avx(&f5, &f0, &f1);
-    f0 = _mm512_permutexvar_epi32(idx16, f4);
-    f1 = _mm512_permutexvar_epi32(idx16, f5);
-    good0 = _mm512_cmp_epi32_mask(f0, bound, 1);
-    good1 = _mm512_cmp_epi32_mask(f1, bound, 1);
-    f2 = _mm512_mullo_epi32(f0,v);
-    f2 = _mm512_srai_epi32(f2,10);
-    f2 = _mm512_mullo_epi32(f2,p);
-    f0 = _mm512_sub_epi32(f0,f2);
-    f0 = _mm512_sub_epi32(eta,f0);
+
+    f4 = _mm512_shuffle_i32x4(f0, f1, 0x44);
+    f5 = _mm512_shuffle_i32x4(f0, f1, 0xEE);
+
+
+    f0 = _mm512_permutexvar_epi16(idx32, f4);
+    f1 = _mm512_permutexvar_epi16(idx32, f5);
+
+    good0 = _mm512_cmp_epi16_mask(f0, bound, 1);
+    good1 = _mm512_cmp_epi16_mask(f1, bound, 1);
+
+    f2 = _mm512_mullo_epi16(f0,v);
+    f2 = _mm512_srai_epi16(f2,10);
+    f2 = _mm512_mullo_epi16(f2,p);
+    f0 = _mm512_sub_epi16(f0,f2);
+    f0 = _mm512_sub_epi16(eta,f0);
     //store
-    _mm512_mask_compressstoreu_epi32(&r[ctr], good0, f0);
-    ctr += _mm_popcnt_u32((int32_t)good0);
-    f3 = _mm512_mullo_epi32(f1,v);
-    f3 = _mm512_srai_epi32(f3,10);
-    f3 = _mm512_mullo_epi32(f3,p);
-    f1 = _mm512_sub_epi32(f1,f3);
-    f1 = _mm512_sub_epi32(eta,f1);
-    _mm512_mask_compressstoreu_epi32(&r[ctr], good1, f1);
-    pos += 16;
-    ctr += _mm_popcnt_u32((int32_t)good1);
+    _mm512_mask_compressstoreu_epi16(&r[ctr], good0, f0);
+    ctr += _mm_popcnt_u32((uint32_t)good0);
+    f3 = _mm512_mullo_epi16(f1,v);
+    f3 = _mm512_srai_epi16(f3,10);
+    f3 = _mm512_mullo_epi16(f3,p);
+    f1 = _mm512_sub_epi16(f1,f3);
+    f1 = _mm512_sub_epi16(eta,f1);
+    _mm512_mask_compressstoreu_epi16(&r[ctr], good1, f1);
+    pos += 32;
+    ctr += _mm_popcnt_u32((uint32_t)good1);
     if(ctr > N - 32) break;
   }  
   uint32_t t0, t1;
@@ -102,53 +109,11 @@ unsigned int rej_eta_avx(int32_t * restrict r, const uint8_t buf[REJ_UNIFORM_ETA
       r[ctr++] = 2 - t1;
     }
   }
-
-  return ctr;
-}
-#elif ETA == 4
-unsigned int rej_eta_avx(int32_t * restrict r, const uint8_t buf[REJ_UNIFORM_ETA_BUFLEN]) {
-  unsigned int ctr, pos;
-  __mmask16 good0, good1;
-  __m512i f0, f1, f2, f3;
-  const __m512i mask = _mm512_set1_epi32(15);
-  const __m512i eta = _mm512_set1_epi32(ETA);
-  const __m512i bound = _mm512_set1_epi32(9);
-  const __m512i idx16  = _mm512_set_epi32(15, 7, 14, 6,13, 5,12, 4,
-                                          11, 3, 10, 2, 9, 1, 8, 0);
-  ctr = pos = 0;
-  while(ctr <= N - 32 && pos <= REJ_UNIFORM_ETA_BUFLEN - 16) {
-    f0 = _mm512_cvtepu8_epi32(_mm_loadu_si128((__m128i *)&buf[pos]));
-    f1 = _mm512_srai_epi32(f0,4);
-    f0 = _mm512_and_si512(f0,mask);
-    // to get the right order
-    f2 = _mm512_shuffle_i32x4(f0, f1, 0x44);
-    f3 = _mm512_shuffle_i32x4(f0, f1, 0xEE);
-    f0 = _mm512_permutexvar_epi32(idx16, f2);
-    f1 = _mm512_permutexvar_epi32(idx16, f3);
-    good0 = _mm512_cmp_epi32_mask(f0, bound, 1);
-    good1 = _mm512_cmp_epi32_mask(f1, bound, 1);
-    //store
-    f0 = _mm512_sub_epi32(eta,f0);
-    _mm512_mask_compressstoreu_epi32(&r[ctr], good0, f0);
-    ctr += _mm_popcnt_u32((int32_t)good0);
-    
-    f1 = _mm512_sub_epi32(eta,f1);  
-    _mm512_mask_compressstoreu_epi32(&r[ctr], good1, f1);
-    ctr += _mm_popcnt_u32((int32_t)good1);
-    pos += 16;
-    if(ctr > N - 32) break;
-  }  
-  uint32_t t0, t1;
-  while(ctr < N && pos < REJ_UNIFORM_ETA_BUFLEN) {
-    t0 = buf[pos] & 0x0F;
-    t1 = buf[pos++] >> 4;
-
-    if(t0 < 9)
-      r[ctr++] = 4 - t0;
-    if(t1 < 9 && ctr < N)
-      r[ctr++] = 4 - t1;
+  for(unsigned int i = 0; i < ctr; i ++)
+  {
+    res[i] = r[i];
   }
-
   return ctr;
 }
-#endif
+
+

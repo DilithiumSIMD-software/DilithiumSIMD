@@ -7,6 +7,7 @@
 #include <immintrin.h>
 #define gama1 1130315200594948
 #define gama2 289360691352306692
+
 int evaluate_cs2_earlycheck_AVX512_opt(polyveck *z2,  const poly *c, const uint32_t s21_table[2*N], const uint32_t s22_table[2*N],  polyveck *w0, int32_t B)
 {
     uint32_t i,j;

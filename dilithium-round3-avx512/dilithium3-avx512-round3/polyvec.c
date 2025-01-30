@@ -14,47 +14,14 @@
 * Arguments:   - polyvecl mat[K]: output matrix
 *              - const uint8_t rho[]: byte array containing seed rho
 **************************************************/
-// void polyvec_matrix_expand(polyvecl mat[K], const uint8_t rho[SEEDBYTES]) {
-//   unsigned int i, j;
 
-//   for(i = 0; i < K; ++i)
-//     for(j = 0; j < L; ++j)
-//       poly_uniform(&mat[i].vec[j], rho, (i << 8) + j);
-// }
-
-// void polyvec_matrix_pointwise_montgomery(polyveck *t, const polyvecl mat[K], const polyvecl *v) {
-//   unsigned int i;
-
-//   for(i = 0; i < K; ++i)
-//     polyvecl_pointwise_acc_montgomery(&t->vec[i], &mat[i], v);
-// }
 void polyvec_matrix_pointwise_montgomery(polyveck *t, const polyvecl mat[K], const polyvecl *v) {
   unsigned int i;
 
   for(i = 0; i < K; ++i)
     polyvecl_pointwise_acc_montgomery(&t->vec[i], &mat[i], v);
 }
-#if K == 4 && L == 4
 
-void polyvec_matrix_expand(polyvecl mat[K], const uint8_t rho[SEEDBYTES]) {
-  polyvec_matrix_expand_row01(&mat[0], &mat[1], rho);
-  polyvec_matrix_expand_row23(&mat[2], &mat[3], rho);
-  int i, j;
-   for(i = 0; i < K; i++) {
-    for(j = 0; j < L; j++) {
-      poly_nttunpack(&mat[i].vec[j]);
-    }
-  }
-}
-void polyvec_matrix_expand_row01(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES])
-{
-  poly_uniform_8x(&rowa->vec[0], &rowa->vec[1], &rowa->vec[2], &rowa->vec[3], &rowb->vec[0], &rowb->vec[1], &rowb->vec[2], &rowb->vec[3], rho, 0, 1, 2, 3, 256, 257, 258, 259);
-}
-void polyvec_matrix_expand_row23(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES])
-{
-  poly_uniform_8x(&rowa->vec[0], &rowa->vec[1], &rowa->vec[2], &rowa->vec[3], &rowb->vec[0], &rowb->vec[1], &rowb->vec[2], &rowb->vec[3], rho, 512, 513, 514, 515, 768, 769, 770, 771);
-}
-#elif K == 6 && L == 5
 void polyvec_matrix_expand(polyvecl mat[K], const uint8_t rho[SEEDBYTES]) {
 
    unsigned int i, j;
@@ -78,54 +45,6 @@ void polyvec_matrix_expand_row345(polyvecl *rowa, polyvecl *rowb, polyvecl *rowc
   poly_uniform_8x(&rowa->vec[1], &rowa->vec[2], &rowa->vec[3], &rowa->vec[4], &rowb->vec[0], &rowb->vec[1], &rowb->vec[2], &rowb->vec[3], rho, 769, 770, 771, 772, 1024, 1025, 1026, 1027);
   poly_uniform_8x(&rowb->vec[4], &rowc->vec[0], &rowc->vec[1], &rowc->vec[2], &rowc->vec[3], &rowc->vec[4], &tmp,  &tmp, rho,  1028, 1280, 1281, 1282, 1283, 1284, 1536, 1537);
 }
-#elif K == 8 && L == 7
-void polyvec_matrix_expand(polyvecl mat[K], const uint8_t rho[SEEDBYTES]) {
-  polyvec_matrix_expandx8_row0(&mat[0], &mat[1], rho);
-  polyvec_matrix_expandx8_row1(&mat[1], &mat[2], rho);
-  polyvec_matrix_expandx8_row2(&mat[2], &mat[3], rho);
-  polyvec_matrix_expandx8_row3(&mat[3], &mat[4], rho);
-  polyvec_matrix_expandx8_row4(&mat[4], &mat[5], rho);
-  polyvec_matrix_expandx8_row5(&mat[5], &mat[6], rho);
-  polyvec_matrix_expandx8_row6(&mat[6], &mat[7], rho);
-  int i, j;
-   for(i = 0; i < K; i++) {
-    for(j = 0; j < L; j++) {
-      poly_nttunpack(&mat[i].vec[j]);
-    }
-  }
-}
-void polyvec_matrix_expandx8_row0(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES])
-{
-  poly_uniform_8x(&rowa->vec[0], &rowa->vec[1], &rowa->vec[2], &rowa->vec[3], &rowa->vec[4], &rowa->vec[5], &rowa->vec[6], &rowb->vec[0], rho, 0, 1, 2, 3, 4, 5, 6, 256);
-} 
-void polyvec_matrix_expandx8_row1(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES])
-{
-  poly_uniform_8x(&rowa->vec[1], &rowa->vec[2], &rowa->vec[3], &rowa->vec[4], &rowa->vec[5], &rowa->vec[6], &rowb->vec[0], &rowb->vec[1], rho, 257, 258, 259, 260, 261, 262, 512, 513);
-} 
-void polyvec_matrix_expandx8_row2(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES])
-{
-  poly_uniform_8x(&rowa->vec[2], &rowa->vec[3], &rowa->vec[4], &rowa->vec[5], &rowa->vec[6], &rowb->vec[0], &rowb->vec[1], &rowb->vec[2], rho, 514, 515, 516, 517, 518, 768, 769, 770);
-} 
-void polyvec_matrix_expandx8_row3(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES])
-{
-  poly_uniform_8x(&rowa->vec[3], &rowa->vec[4], &rowa->vec[5], &rowa->vec[6], &rowb->vec[0], &rowb->vec[1], &rowb->vec[2], &rowb->vec[3], rho, 771, 772, 773, 774, 1024, 1025, 1026, 1027);
-} 
-void polyvec_matrix_expandx8_row4(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES])
-{
-  poly_uniform_8x(&rowa->vec[4], &rowa->vec[5], &rowa->vec[6], &rowb->vec[0], &rowb->vec[1], &rowb->vec[2], &rowb->vec[3], &rowb->vec[4], rho, 1028, 1029, 1030, 1280, 1281, 1282, 1283, 1284);
-} 
-void polyvec_matrix_expandx8_row5(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES])
-{
-  poly_uniform_8x(&rowa->vec[5], &rowa->vec[6], &rowb->vec[0], &rowb->vec[1], &rowb->vec[2], &rowb->vec[3], &rowb->vec[4], &rowb->vec[5], rho, 1285, 1286, 1536, 1537,  1538, 1539, 1540, 1541);
-} 
-void polyvec_matrix_expandx8_row6(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES])
-{
-  poly_uniform_8x(&rowa->vec[6], &rowb->vec[0], &rowb->vec[1], &rowb->vec[2], &rowb->vec[3], &rowb->vec[4], &rowb->vec[5], &rowb->vec[6], rho, 1542, 1792, 1793, 1794, 1795, 1796, 1797, 1798);
-} 
-
-#else
-#error
-#endif
 
 /**************************************************************/
 /************ Vectors of polynomials of length L **************/
@@ -261,19 +180,7 @@ void polyvecl_pointwise_poly_montgomery(polyvecl *r, const poly *a, const polyve
 *              - const polyvecl *u: pointer to first input vector
 *              - const polyvecl *v: pointer to second input vector
 **************************************************/
-// void polyvecl_pointwise_acc_montgomery(poly *w,
-//                                        const polyvecl *u,
-//                                        const polyvecl *v)
-// {
-//   unsigned int i;
-//   poly t;
 
-//   poly_pointwise_montgomery(w, &u->vec[0], &v->vec[0]);
-//   for(i = 1; i < L; ++i) {
-//     poly_pointwise_montgomery(&t, &u->vec[i], &v->vec[i]);
-//     poly_add(w, w, &t);
-//   }
-// }
 void polyvecl_pointwise_acc_montgomery(poly *w,
                                        const polyvecl *u,
                                        const polyvecl *v)

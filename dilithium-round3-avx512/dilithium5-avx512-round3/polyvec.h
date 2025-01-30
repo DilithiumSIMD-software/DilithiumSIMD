@@ -48,6 +48,7 @@ typedef struct {
   poly vec[K];
 } polyveck;
 
+
 #define polyveck_uniform_eta DILITHIUM_NAMESPACE(_polyveck_uniform_eta)
 void polyveck_uniform_eta(polyveck *v, const uint8_t seed[SEEDBYTES], uint16_t nonce);
 
@@ -101,11 +102,6 @@ void polyveck_tailoredntt(polyveck *v);
 void polyveck_instailoredntt(polyveck *v);
 void polyvecl_tailoredntt(polyvecl *v);
 void polyvecl_instailoredntt(polyvecl *v);
-void polyvec_matrix_expand_row012(polyvecl *rowa, polyvecl *rowb, polyvecl *rowc, polyvecl *rowd, const uint8_t rho[SEEDBYTES]);
-void polyvec_matrix_expand_row345(polyvecl *rowa, polyvecl *rowb, polyvecl *rowc,const uint8_t rho[SEEDBYTES]);
-void polyvec_matrix_expand_row01(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES]);
-void polyvec_matrix_expand_row23(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES]);
-void polyvec_matrix_expand_row45(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES]);
 void polyvec_matrix_expandx8_row0(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES]);
 void polyvec_matrix_expandx8_row1(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES]);
 void polyvec_matrix_expandx8_row2(polyvecl *rowa, polyvecl *rowb, const uint8_t rho[SEEDBYTES]);

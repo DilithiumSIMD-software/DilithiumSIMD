@@ -3,21 +3,10 @@
 
 #include "config.h"
 
-#if DILITHIUM_MODE == 2
-#define CRYPTO_PUBLICKEYBYTES 1312
-#define CRYPTO_SECRETKEYBYTES 2544
-#define CRYPTO_BYTES 2420
 
-#elif DILITHIUM_MODE == 3
-#define CRYPTO_PUBLICKEYBYTES 1952
-#define CRYPTO_SECRETKEYBYTES 4016
-#define CRYPTO_BYTES 3293
-
-#elif DILITHIUM_MODE == 5
 #define CRYPTO_PUBLICKEYBYTES 2592
 #define CRYPTO_SECRETKEYBYTES 4880
 #define CRYPTO_BYTES 4595
-#endif
 
 #define crypto_sign_keypair DILITHIUM_NAMESPACE(_keypair)
 int crypto_sign_keypair(unsigned char *pk, unsigned char *sk);

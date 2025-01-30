@@ -6,9 +6,7 @@
 #include "align.h"
 #include "consts.h"
 
-// typedef struct {
-//   int32_t coeffs[N];
-// } poly;
+
 typedef ALIGNED_INT32(N) poly;
 void poly_nttunpack(poly *a);
 void poly_tailoredntt(poly *a);

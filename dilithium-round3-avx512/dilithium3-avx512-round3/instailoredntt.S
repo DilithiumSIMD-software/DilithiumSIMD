@@ -25,10 +25,8 @@ vpaddd		%zmm21,%zmm\l,%zmm\l
 .endm
 
 .macro instailoredbutterfly l,h,zh0=18
-//偶数下标z
 vpmuldq		%zmm\zh0,%zmm\h,%zmm20
 vmovshdup	%zmm\h,%zmm19
-//奇数下标z
 vpmuldq		%zmm\zh0,%zmm19,%zmm21
  
  //r = z >> 23
@@ -36,9 +34,7 @@ vpsrlq		$23,%zmm20,%zmm23
 vpsrlq		$23,%zmm21,%zmm24
 
 //-q*r + z
-//偶数下标
 vpmadd52luq %zmm17,%zmm23,%zmm20
-//奇数下标
 vpmadd52luq %zmm17,%zmm24,%zmm21
 
 vpsllq		$32,%zmm21,%zmm21

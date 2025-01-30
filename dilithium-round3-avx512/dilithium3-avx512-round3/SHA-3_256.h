@@ -7,4 +7,3 @@
 
 int keccak_avx512(const uint8_t *in, int inlen, uint8_t *md, int r);
 void keccakF(__m512i* x, int rnd);
-// void shake256_avx512(const uint8_t *in, int inlen, uint8_t *md, int outlen);

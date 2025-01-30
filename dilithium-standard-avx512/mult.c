@@ -12,7 +12,6 @@ int evaluate_cs1_cs2_early_check_32_AVX512_opt(polyvecl *z1, polyveck *z2, const
     uint32_t i,j;
 	__m512i answervec[16];
 	__m512i answervec2[16];
-    //for 循环
     for(i=0;i<16;++i)
     {
         answervec[i]=_mm512_setzero_epi32();

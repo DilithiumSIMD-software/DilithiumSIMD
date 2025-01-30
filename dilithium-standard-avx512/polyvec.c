@@ -13,13 +13,7 @@
 * Arguments:   - polyvecl mat[K]: output matrix
 *              - const uint8_t rho[]: byte array containing seed rho
 **************************************************/
-// void polyvec_matrix_expand(polyvecl mat[K], const uint8_t rho[SEEDBYTES]) {
-//   unsigned int i, j;
 
-//   for(i = 0; i < K; ++i)
-//     for(j = 0; j < L; ++j)
-//       poly_uniform(&mat[i].vec[j], rho, (i << 8) + j);
-// }
 #if K == 4 && L == 4
 
 void polyvec_matrix_expand(polyvecl mat[K], const uint8_t rho[SEEDBYTES]) {

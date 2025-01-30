@@ -6,7 +6,7 @@
 #include "cpucycles.h"
 #include "speed_print.h"
 
-#define NTESTS 10000
+#define NTESTS 100000
 
 uint64_t t[NTESTS];
 

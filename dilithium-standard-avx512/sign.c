@@ -108,23 +108,23 @@ int crypto_sign_signature(uint8_t *sig,
                           const uint8_t *sk)
 {
   unsigned int n;
-  __attribute__((aligned(32))) uint8_t seedbuf[2*SEEDBYTES + TRBYTES + RNDBYTES + 2*CRHBYTES];
+  __attribute__((aligned(64))) uint8_t seedbuf[2*SEEDBYTES + TRBYTES + RNDBYTES + 2*CRHBYTES];
   uint8_t *rho, *tr, *key, *mu, *rhoprime, *rnd;
   uint16_t nonce = 0;
   polyvecl mat[K], s1, y, z;
   polyveck t0, s2, w1, w0, h;
   poly cp, tmp;
   #if K == 4
-  __attribute__((aligned(32))) uint32_t s1_table[2*N];
-  __attribute__((aligned(32))) uint32_t s2_table[2*N];
+  __attribute__((aligned(64))) uint32_t s1_table[2*N];
+  __attribute__((aligned(64))) uint32_t s2_table[2*N];
   #elif K == 6
-  __attribute__((aligned(32))) uint32_t s11_table[2*N], s12_table[2*N];
-  __attribute__((aligned(32))) uint32_t s21_table[2*N], s22_table[2*N];
+  __attribute__((aligned(64))) uint32_t s11_table[2*N], s12_table[2*N];
+  __attribute__((aligned(64))) uint32_t s21_table[2*N], s22_table[2*N];
   #elif K == 8
-  __attribute__((aligned(32))) uint32_t s11_table[2*N];
-  __attribute__((aligned(32))) uint32_t s12_table[2*N];
-  __attribute__((aligned(32))) uint32_t s21_table[2*N];
-  __attribute__((aligned(32))) uint32_t s22_table[2*N];
+  __attribute__((aligned(64))) uint32_t s11_table[2*N];
+  __attribute__((aligned(64))) uint32_t s12_table[2*N];
+  __attribute__((aligned(64))) uint32_t s21_table[2*N];
+  __attribute__((aligned(64))) uint32_t s22_table[2*N];
   #endif
   rho = seedbuf;
   tr = rho + SEEDBYTES;
@@ -167,7 +167,6 @@ int crypto_sign_signature(uint8_t *sig,
   polyveck_instailoredntt(&t0);
 rej:
   /* Sample intermediate vector y */
-  // polyvecl_uniform_gamma1(&y, rhoprime, nonce++);
   #if L == 4
     poly_uniform_gamma1_8x(&y.vec[0], &y.vec[1], &y.vec[2], &y.vec[3], &tmp, &tmp, &tmp, &tmp,rhoprime, nonce, nonce + 1, nonce + 2, nonce + 3, 0, 0, 0, 0);  
     nonce += 4;

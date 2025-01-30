@@ -1,0 +1,109 @@
+0 [140695824574272] INFO perfrun.launcher <> - Launcher main begin
+1 [140695824574272] INFO perfrun.launcher <> - MessageCatalogInit finished
+1 [140695824574272] INFO perfrun.launcher <> - Launcher instance created
+1 [140695824574272] INFO perfrun.launcher <> - argc = 7; cmdline = /opt/intel/oneapi/vtune/2025.0/bin64/amplxe-runss --ui-output-format xml --ui-output-fd 5 --option-file /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs/config/runss.options 
+22 [140695824574272] INFO perfrun.perfcollector <> - SEP tool path: /opt/intel/oneapi/vtune/2025.0/bin64/sep
+26 [140695824574272] INFO perfrun.launcher <> - create msngr2::ICliToolContext
+27 [140695824574272] INFO perfrun.launcher <> - create file finder object
+27 [140695824574272] INFO perfrun.launcher <> - create a result directory: pattern = /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs pid = 4294967295
+46 [140695824574272] INFO perfrun.sdk <> - checked that the directory /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs is a local directory
+46 [140695824574272] INFO perfrun.sdk <> - the directory /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs is a local directory with FS type ID 61267
+46 [140695824574272] INFO perfrun.launcher <> - create data directory = /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs/data.0
+46 [140695824574272] INFO perfrun.launcher <> - Creating the master collection flag
+47 [140695824574272] INFO perfrun.launcher <> - Done creating the master collection flag
+70 [140695671137856] INFO perfrun.launcher <> - plugin [remoteplug] was disabled because it doesn't support the given collection type.
+70 [140695671137856] INFO perfrun.sdk <> - Allocating TMU :/root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs/data.0/systemcollector-276157-iZuf69r58ik617qizrjr9mZ.sc
+70 [140695671137856] INFO perfrun.system <> - Tpss based collection
+70 [140695671137856] INFO perfrun.launcher <> - plugin [ptracecollector] was disabled because it doesn't support the given collection type.
+70 [140695671137856] INFO perfrun.launcher <> - plugin [gpu] was disabled because it doesn't support the given collection type.
+70 [140695671137856] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+70 [140695671137856] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+70 [140695671137856] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+70 [140695671137856] INFO perfrun.mrte <> - system-wide mode is 0
+70 [140695671137856] INFO perfrun.mrte <> - Getting  mrte profiling environment ...
+75 [140695671137856] INFO perfrun.mrte <> - INTEL_MRTE_DATA_DIR=/root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs/data.0
+75 [140695671137856] INFO perfrun.mrte <> - INTEL_MRTE_HOST_NAME=iZuf69r58ik617qizrjr9mZ
+75 [140695671137856] INFO perfrun.mrte <> - JAVA_TOOL_OPTIONS=-agentlib:amplxe_samplingmrte_javaprof_1.0 -Dsun.boot.library.path=/opt/intel/oneapi/vtune/2025.0/lib32/runtime:/opt/intel/oneapi/vtune/2025.0/lib64/runtime
+75 [140695671137856] INFO perfrun.mrte <> - LD_LIBRARY_PATH=/opt/intel/oneapi/vtune/2025.0/lib32/runtime:/opt/intel/oneapi/vtune/2025.0/lib64/runtime
+75 [140695671137856] INFO perfrun.mrte <> - CORECLR_ENABLE_PROFILING=1
+75 [140695671137856] INFO perfrun.mrte <> - CORECLR_PROFILER={AA5E4821-E3B1-479c-B7FF-5AD047D22CED}
+75 [140695671137856] INFO perfrun.mrte <> - CORECLR_PROFILER_PATH=/opt/intel/oneapi/vtune/2025.0/lib64/libamplxe_samplingmrte_clrprof_1.0.so
+75 [140695671137856] INFO perfrun.mrte <> - INTEL_MRTE_PROFILER_MODE=mixed
+75 [140695671137856] INFO perfrun.mrte <> - Data directory: /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs/data.0
+75 [140695671137856] INFO perfrun.mrte <> - Mrte plugin is initialized
+75 [140695671137856] INFO perfrun.launcher <> - plugin [emon] was disabled because it doesn't support the given collection type.
+75 [140695671137856] INFO perfrun.launcher <> - plugin [cuscol] was disabled because it doesn't support the given collection type.
+75 [140695671137856] INFO perfrun.launcher <> - plugin [stdsrc] was disabled because it doesn't support the given collection type.
+75 [140695671137856] INFO perfrun.launcher <> - plugin [sep] was disabled because it doesn't support the given collection type.
+75 [140695671137856] INFO perfrun.launcher <> - plugin [vtsspp] was disabled because it doesn't support the given collection type.
+75 [140695671137856] INFO perfrun.launcher <> - plugin [perf] was disabled because it doesn't support the given collection type.
+75 [140695671137856] INFO perfrun.launcher <> - plugin [aoclprofile] was disabled because it doesn't support the given collection type.
+75 [140695671137856] INFO perfrun.tpss <> - initialize tpss controller
+75 [140695671137856] INFO perfrun.tpss <> - configure collection mode: value = cpu:counters:nostack
+75 [140695671137856] INFO perfrun.tpss <> - configure collection mode: value = cpu:stack
+75 [140695671137856] INFO perfrun.tpss <> - default obj-size-min=1024
+75 [140695671137856] INFO perfrun.tpss <> - default hash-table-size=0
+76 [140695671137856] INFO perfrun.launcher <> - plugin [media] was disabled because it doesn't support the given collection type.
+76 [140695671137856] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+76 [140695671137856] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+76 [140695671137856] INFO perfrun.launcher <> - plugin [parallelfs] was disabled because it doesn't support the given collection type.
+76 [140695671137856] INFO perfrun.launcher <> - plugin [power] was disabled because it doesn't support the given collection type.
+76 [140695671137856] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+76 [140695671137856] INFO perfrun.launcher <> - plugin [ipmwatch] was disabled because it doesn't support the given collection type.
+76 [140695671137856] INFO perfrun.launcher <> - plugin [os_counters] was disabled because it doesn't support the given collection type.
+76 [140695671137856] INFO perfrun.launcher <> - plugin [l0_metrics] was disabled because it doesn't support the given collection type.
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: LD_LIBRARY_PATH = /opt/intel/oneapi/vtune/2025.0/lib32/runtime:/opt/intel/oneapi/vtune/2025.0/lib64/runtime
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: INTEL_LIBITTNOTIFY32 = /opt/intel/oneapi/vtune/2025.0/lib32/runtime/libittnotify_collector.so
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: INTEL_LIBITTNOTIFY64 = /opt/intel/oneapi/vtune/2025.0/lib64/runtime/libittnotify_collector.so
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: INTEL_ITTNOTIFY_GROUPS = 
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: INTEL_JIT_PROFILER32 = /opt/intel/oneapi/vtune/2025.0/lib32/runtime/libittnotify_collector.so
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: INTEL_JIT_PROFILER64 = /opt/intel/oneapi/vtune/2025.0/lib64/runtime/libittnotify_collector.so
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: CCL_ITT_LEVEL = 1
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: ENABLE_JITPROFILING = 1
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: CL_CONFIG_USE_VTUNE = True
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: KMP_FORKJOIN_FRAMES = 0
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: KMP_FORKJOIN_FRAMES_MODE = 0
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: INTEL_MRTE_DATA_DIR = /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs/data.0
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: INTEL_MRTE_HOST_NAME = iZuf69r58ik617qizrjr9mZ
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: JAVA_TOOL_OPTIONS = -agentlib:amplxe_samplingmrte_javaprof_1.0 -Dsun.boot.library.path=/opt/intel/oneapi/vtune/2025.0/lib32/runtime:/opt/intel/oneapi/vtune/2025.0/lib64/runtime
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: LD_LIBRARY_PATH = /opt/intel/oneapi/vtune/2025.0/lib32/runtime:/opt/intel/oneapi/vtune/2025.0/lib64/runtime
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: CORECLR_ENABLE_PROFILING = 1
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: CORECLR_PROFILER = {AA5E4821-E3B1-479c-B7FF-5AD047D22CED}
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: CORECLR_PROFILER_PATH = /opt/intel/oneapi/vtune/2025.0/lib64/libamplxe_samplingmrte_clrprof_1.0.so
+76 [140695824574272] INFO perfrun.launcher <> - set environment variable: INTEL_MRTE_PROFILER_MODE = mixed
+76 [140695824574272] INFO perfrun.launcher <> - RpcServer: run RPC server to handle requests
+76 [140695824574272] INFO perfrun.launcher <> - Launcher: command line to start before modification = ./test/test_dilithium3
+76 [140695824574272] INFO perfrun.launcher <> - Launcher: command line to start after modification = /opt/intel/oneapi/vtune/2025.0/bin64/pin -error_file /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs/data.0/pinerr.tpsslog -detach_reattach -follow_execv -tool_load_option deepbind -t64 /opt/intel/oneapi/vtune/2025.0/lib64/libtpsstool.so -t /opt/intel/oneapi/vtune/2025.0/lib32/libtpsstool.so -server_name tpss_ipc.276157 -prd_dir /opt/intel/oneapi/vtune/2025.0 -- ./test/test_dilithium3
+76 [140695824574272] INFO perfrun.launcher <> - ProcessCreator object was created
+77 [140695824574272] INFO perfrun.launcher <> - Launcher: the process was started in suspend mode
+78 [140695671137856] WARN perfrun.system <> - Folder "/sys/kernel/debug/kvm"doesn't exist, at file: vcs/perfrun1/plugins/system/src/trace_writer.cpp:720
+78 [140695671137856] WARN perfrun.system <> - Folder "/var/run/libvirt/qemu/"doesn't exist, at file: vcs/perfrun1/plugins/system/src/trace_writer.cpp:800
+78 [140695671137856] INFO perfrun.sdk <> - runCmd: /opt/intel/oneapi/vtune/2025.0/bin64/sep -platform-info
+78 [140695671137856] INFO perfrun.sdk <> - runCmd started PID 276163
+190 [140695671137856] INFO perfrun.sdk <> - sep platform info successfully parsed
+191 [140695671137856] WARN perfrun.sdk <> - Failed to find xl binary on any of the system paths: /bin, /sbin, /usr/bin, /usr/sbin., at file: vcs/perfrun1/sdk/src/utils.cpp:205
+191 [140695671137856] WARN perfrun.system <> - Could not start ContainerMapping collector, at file: vcs/perfrun1/plugins/system/src/controller.cpp:450
+298 [140695671137856] INFO perfrun.vdso <> - Helper runtool '/opt/intel/oneapi/vtune/2025.0/bin32/amplxe-runss -dump-vdso -r /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs --tmp-dir /tmp/amplxe-tmp-root' returned 0
+339 [140695671137856] INFO perfrun.vdso <> - Helper runtool '/opt/intel/oneapi/vtune/2025.0/bin64/amplxe-runss -dump-vdso -r /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs --tmp-dir /tmp/amplxe-tmp-root' returned 0
+339 [140695671137856] INFO perfrun.itt <> - start itt controller for pid #276162
+339 [140695671137856] INFO perfrun.tpss <> - start tpss controller for pid #276162
+389 [140695824574272] INFO perfrun.launcher <> - Launcher: all plugins were started
+390 [140695824574272] INFO perfrun.launcher <> - DirectoryMonitor object was created
+390 [140695824574272] INFO perfrun.launcher <> - DirectoryMonitor: a callback was added
+390 [140695824574272] INFO perfrun.launcher <> - DirectoryMonitor was started with pingTime = 1000
+390 [140695824574272] INFO perfrun.launcher <> - DeadlineTimer is going to be constructed
+390 [140695824574272] INFO perfrun.launcher <> - DeadlineTimer: a callback was added
+392 [140695824574272] INFO perfrun.launcher <> - Launcher: resume the profiled application and  wait its termination or stop command
+13686 [140695824574272] INFO perfrun.launcher <> - Launcher: the profiled application was terminated  with exit code = 0
+13688 [140695671137856] INFO perfrun.itt <> - detach itt controller
+13688 [140695671137856] INFO perfrun.itt <> - detach itt controller done
+13688 [140695671137856] INFO perfrun.tpss <> - stop tpss controller
+13688 [140695671137856] INFO perfrun.sdk <> - De-allocating TMU: /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs/data.0/systemcollector-276157-iZuf69r58ik617qizrjr9mZ.sc
+13688 [140695671137856] INFO perfrun.system <> - closed the system trace file: /root/avx512_test/DilithiumSIMD/dilithium-round3-avx512/dilithium3-avx512-round3/r000hs/data.0/systemcollector-276157-iZuf69r58ik617qizrjr9mZ.sc
+13688 [140695824574272] INFO perfrun.launcher <> - Launcher: all plugins were stopped.
+13688 [140695824574272] INFO perfrun.launcher <> - DeadlineTimer is going to be destroyed
+13689 [140695824574272] INFO perfrun.launcher <> - DeadlineTimer was destroyed
+13689 [140695824574272] INFO perfrun.launcher <> - DirectoryMonitor object was destroyed
+13689 [140695824574272] WARN perfrun.launcher <> - Stop command is ignored because it is received when collection is already stopped, at file: vcs/perfrun1/launcher/src/command_handler.cpp:226
+13689 [140695824574272] INFO perfrun.launcher <> - Application exit code: 0
+13689 [140695824574272] INFO perfrun.launcher <> - Exit code: 0

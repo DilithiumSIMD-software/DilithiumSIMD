@@ -11,8 +11,7 @@
 #define masks 67372036
 int main(void)
 {
-//小多项式对
-unsigned int i,j;
+  unsigned int i,j;
   __attribute__((aligned(64)))
   uint8_t seedbuf[3*SEEDBYTES];
   __attribute__((aligned(64)))
@@ -53,7 +52,6 @@ unsigned int i,j;
 
 	__m512i answervec[16];
 	__m512i answervec2[16];
-    //for 循环
     for(i=0;i<16;++i)
     {
         answervec[i]=_mm512_setzero_epi32();

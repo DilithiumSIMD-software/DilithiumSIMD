@@ -206,7 +206,6 @@ void poly_shiftl(poly *a) {
 void poly_ntt(poly *a) {
   DBENCH_START();
 
-  // ntt(a->coeffs);
   ntt_avx(a->vec, qdata.vec);
 
   DBENCH_STOP(*tmul);
@@ -224,8 +223,7 @@ void poly_ntt(poly *a) {
 void poly_invntt_tomont(poly *a) {
   DBENCH_START();
 
-  // invntt_tomont(a->coeffs);
-   invntt_avx(a->vec, qdata.vec);
+  invntt_avx(a->vec, qdata.vec);
 
   DBENCH_STOP(*tmul);
 }
@@ -242,11 +240,8 @@ void poly_invntt_tomont(poly *a) {
 *              - const poly *b: pointer to second input polynomial
 **************************************************/
 void poly_pointwise_montgomery(poly *c, const poly *a, const poly *b) {
-  // unsigned int i;
   DBENCH_START();
   pointwise_avx(c->vec, a->vec, b->vec, qdata.vec);
-  // for(i = 0; i < N; ++i)
-    // c->coeffs[i] = montgomery_reduce((int64_t)a->coeffs[i] * b->coeffs[i]);
     
 
   DBENCH_STOP(*tmul);
@@ -265,11 +260,7 @@ void poly_pointwise_montgomery(poly *c, const poly *a, const poly *b) {
 *              - const poly *a: pointer to input polynomial
 **************************************************/
 void poly_power2round(poly *a1, poly *a0, const poly *a) {
-  // unsigned int i;
   DBENCH_START();
-
-  // for(i = 0; i < N; ++i)
-  //   a1->coeffs[i] = power2round(&a0->coeffs[i], a->coeffs[i]);
   power2round_avx(a1->vec, a0->vec, a->vec);
 
   DBENCH_STOP(*tround);
@@ -289,14 +280,6 @@ void poly_power2round(poly *a1, poly *a0, const poly *a) {
 *              - const poly *a: pointer to input polynomial
 **************************************************/
 void poly_decompose(poly *a1, poly *a0, const poly *a) {
-  // unsigned int i;
-  // DBENCH_START();
-
-  // for(i = 0; i < N; ++i)
-  //   a1->coeffs[i] = decompose(&a0->coeffs[i], a->coeffs[i]);
-  
-
-  // DBENCH_STOP(*tround);
   decompose_avx(a1->vec, a0->vec, a->vec);
 }
 
@@ -314,19 +297,10 @@ void poly_decompose(poly *a1, poly *a0, const poly *a) {
 * Returns number of 1 bits.
 **************************************************/
 unsigned int poly_make_hint(poly *h, const poly *a0, const poly *a1) {
-  unsigned int i, s = 0;
-  DBENCH_START();
 
-  for(i = 0; i < N; ++i) {
-    h->coeffs[i] = make_hint(a0->coeffs[i], a1->coeffs[i]);
-    s += h->coeffs[i];
-  }
- 
-  return s;
-  DBENCH_STOP(*tround);
-  //  unsigned int r;
-  // r = make_hint_avx(h->vec, a0->vec, a1->vec);
-  // return r;
+   unsigned int r;
+  r = make_hint_avx(h->coeffs, a0->coeffs, a1->coeffs);
+  return r;
   
 }
 
@@ -340,13 +314,7 @@ unsigned int poly_make_hint(poly *h, const poly *a0, const poly *a1) {
 *              - const poly *h: pointer to input hint polynomial
 **************************************************/
 void poly_use_hint(poly *b, const poly *a, const poly *h) {
-  // unsigned int i;
-  // DBENCH_START();
 
-  // for(i = 0; i < N; ++i)
-  //   b->coeffs[i] = use_hint(a->coeffs[i], h->coeffs[i]);
-
-  // DBENCH_STOP(*tround);
   use_hint_avx(b->vec, a->vec, h->vec);
 }
 
@@ -564,7 +532,6 @@ static unsigned int rej_eta(int32_t *a,
     t0 = buf[pos] & 0x0F;
     t1 = buf[pos++] >> 4;
 
-#if ETA == 2
     if(t0 < 15) {
       t0 = t0 - (205*t0 >> 10)*5;
       a[ctr++] = 2 - t0;
@@ -573,12 +540,6 @@ static unsigned int rej_eta(int32_t *a,
       t1 = t1 - (205*t1 >> 10)*5;
       a[ctr++] = 2 - t1;
     }
-#elif ETA == 4
-    if(t0 < 9)
-      a[ctr++] = 4 - t0;
-    if(t1 < 9 && ctr < len)
-      a[ctr++] = 4 - t1;
-#endif
   }
 
   DBENCH_STOP(*tsample);
@@ -596,11 +557,8 @@ static unsigned int rej_eta(int32_t *a,
 *              - const uint8_t seed[]: byte array with seed of length SEEDBYTES
 *              - uint16_t nonce: 2-byte nonce
 **************************************************/
-#if ETA == 2
 #define POLY_UNIFORM_ETA_NBLOCKS ((136 + STREAM128_BLOCKBYTES - 1)/STREAM128_BLOCKBYTES)
-#elif ETA == 4
-#define POLY_UNIFORM_ETA_NBLOCKS ((227 + STREAM128_BLOCKBYTES - 1)/STREAM128_BLOCKBYTES)
-#endif
+
 void poly_uniform_eta(poly *a,
                       const uint8_t seed[SEEDBYTES],
                       uint16_t nonce)
@@ -674,8 +632,6 @@ void poly_uniform_eta_8x(poly *a0,
 
 
   __m512i state[25];
-
-  // shake256x8(state, buf[0].coeffs, buf[1].coeffs, buf[2].coeffs, buf[3].coeffs, buf[4].coeffs, buf[5].coeffs, buf[6].coeffs, buf[7].coeffs, REJ_UNIFORM_ETA_BUFLEN, buf[0].coeffs, buf[1].coeffs, buf[2].coeffs, buf[3].coeffs, buf[4].coeffs, buf[5].coeffs, buf[6].coeffs, buf[7].coeffs, 34); 
   shake128x8(state, buf[0].coeffs, buf[1].coeffs, buf[2].coeffs, buf[3].coeffs, buf[4].coeffs, buf[5].coeffs, buf[6].coeffs, buf[7].coeffs, REJ_UNIFORM_ETA_BUFLEN, buf[0].coeffs, buf[1].coeffs, buf[2].coeffs, buf[3].coeffs, buf[4].coeffs, buf[5].coeffs, buf[6].coeffs, buf[7].coeffs, 34); 
 
   ctr0 = rej_eta_avx(a0->coeffs, buf[0].coeffs);
@@ -689,7 +645,6 @@ void poly_uniform_eta_8x(poly *a0,
  
   while(ctr0 < N || ctr1 < N || ctr2 < N || ctr3 < N || ctr4 < N || ctr5 < N || ctr6 < N || ctr7 < N) {
     keccak_squeezeblocks8x(buf[0].coeffs, buf[1].coeffs, buf[2].coeffs, buf[3].coeffs, buf[4].coeffs, buf[5].coeffs, buf[6].coeffs, buf[7].coeffs, 1, state, SHAKE128_RATE);
-    // keccak_squeezeblocks8x(buf[0].coeffs, buf[1].coeffs, buf[2].coeffs, buf[3].coeffs, buf[4].coeffs, buf[5].coeffs, buf[6].coeffs, buf[7].coeffs, 1, state, SHAKE256_RATE);
     ctr0 += rej_eta(a0->coeffs + ctr0, N - ctr0, buf[0].coeffs, SHAKE256_RATE);
     ctr1 += rej_eta(a1->coeffs + ctr1, N - ctr1, buf[1].coeffs, SHAKE256_RATE);
     ctr2 += rej_eta(a2->coeffs + ctr2, N - ctr2, buf[2].coeffs, SHAKE256_RATE);
@@ -711,11 +666,7 @@ void poly_uniform_eta_8x(poly *a0,
 *              - const uint8_t seed[]: byte array with seed of length CRHBYTES
 *              - uint16_t nonce: 16-bit nonce
 **************************************************/
-#if GAMMA1 == (1 << 17)
 #define POLY_UNIFORM_GAMMA1_NBLOCKS ((576 + STREAM256_BLOCKBYTES - 1)/STREAM256_BLOCKBYTES)
-#elif GAMMA1 == (1 << 19)
-#define POLY_UNIFORM_GAMMA1_NBLOCKS ((640 + STREAM256_BLOCKBYTES - 1)/STREAM256_BLOCKBYTES)
-#endif
 void poly_uniform_gamma1(poly *a,
                          const uint8_t seed[CRHBYTES],
                          uint16_t nonce)
@@ -854,33 +805,35 @@ void poly_challenge(poly *c, const uint8_t seed[SEEDBYTES]) {
 **************************************************/
 void polyeta_pack(uint8_t *r, const poly *a) {
   unsigned int i;
-  uint8_t t[8];
-  DBENCH_START();
-
-#if ETA == 2
-  for(i = 0; i < N/8; ++i) {
-    t[0] = ETA - a->coeffs[8*i+0];
-    t[1] = ETA - a->coeffs[8*i+1];
-    t[2] = ETA - a->coeffs[8*i+2];
-    t[3] = ETA - a->coeffs[8*i+3];
-    t[4] = ETA - a->coeffs[8*i+4];
-    t[5] = ETA - a->coeffs[8*i+5];
-    t[6] = ETA - a->coeffs[8*i+6];
-    t[7] = ETA - a->coeffs[8*i+7];
-
-    r[3*i+0]  = (t[0] >> 0) | (t[1] << 3) | (t[2] << 6);
-    r[3*i+1]  = (t[2] >> 2) | (t[3] << 1) | (t[4] << 4) | (t[5] << 7);
-    r[3*i+2]  = (t[5] >> 1) | (t[6] << 2) | (t[7] << 5);
+  int8_t t[N];
+  for(i = 0; i < N; i ++)
+  {
+    t[i] = a->coeffs[i];
   }
-#elif ETA == 4
-  for(i = 0; i < N/2; ++i) {
-    t[0] = ETA - a->coeffs[2*i+0];
-    t[1] = ETA - a->coeffs[2*i+1];
-    r[i] = t[0] | (t[1] << 4);
+  __m512i idx64 = _mm512_set_epi8(63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 58, 57, 56, 50, 49, 48, 42, 41, 40, 34, 33, 32, 26, 25, 24, 18, 17, 16, 10, 9, 8, 2, 1, 0);
+  __m512i s_vec, tmp;
+  __m512i mask_vec[3];
+  __mmask64 mask = 0xffffff;
+  mask_vec[0] = _mm512_set1_epi16(0xff);
+  mask_vec[1] = _mm512_set1_epi32(0xffff);
+  mask_vec[2] = _mm512_set1_epi64(0xffffffff);
+  const __m512i eta = _mm512_set1_epi8(2);
+  for(i = 0; i < 4; i ++)
+  {
+    s_vec = _mm512_loadu_si512(&t[i*64]);
+    s_vec = _mm512_sub_epi8(eta, s_vec);
+    tmp = _mm512_srli_epi16(s_vec, 5);
+    s_vec = _mm512_xor_si512(s_vec, tmp);
+    s_vec = _mm512_and_si512(s_vec, mask_vec[0]);
+    tmp = _mm512_srli_epi32(s_vec, 10);
+    s_vec = _mm512_xor_si512(s_vec, tmp);
+    s_vec = _mm512_and_si512(s_vec, mask_vec[1]);
+    tmp = _mm512_srli_epi64(s_vec, 20);
+    s_vec = _mm512_xor_si512(s_vec, tmp);
+    s_vec = _mm512_and_si512(s_vec, mask_vec[2]);
+    s_vec = _mm512_maskz_permutexvar_epi8(mask, idx64, s_vec);
+    _mm512_mask_storeu_epi8(&r[24*i], mask, s_vec);
   }
-#endif
-
-  DBENCH_STOP(*tpack);
 }
 
 /*************************************************
@@ -891,40 +844,32 @@ void polyeta_pack(uint8_t *r, const poly *a) {
 * Arguments:   - poly *r: pointer to output polynomial
 *              - const uint8_t *a: byte array with bit-packed polynomial
 **************************************************/
-void polyeta_unpack(poly *r, const uint8_t *a) {
-  unsigned int i;
-  DBENCH_START();
+void polyeta_unpack(poly *res, const uint8_t *a)
+{
+   int16_t r[N];
+   const __m512i idx64  = _mm512_set_epi8(63, 11, 63, 11, 11, 10, 63, 10, 63, 10, 10, 9, 63, 9, 63, 9, 63, 8, 63, 8, 8, 7, 63, 7, 63, 7, 7, 6, 63, 6, 63, 6, 63, 5, 63, 5, 5, 4, 63, 4, 63, 4, 4, 3, 63, 3, 63, 3, 63, 2, 63, 2, 2, 1, 63, 1, 63, 1, 1, 0, 63, 0, 63, 0);
+   const __m512i idx32  = _mm512_set_epi16(5, 2, 7, 4, 1, 6, 3, 0, 5, 2, 7, 4, 1, 6, 3, 0, 5, 2, 7, 4, 1, 6, 3, 0, 5, 2, 7, 4, 1, 6, 3, 0);
 
-#if ETA == 2
-  for(i = 0; i < N/8; ++i) {
-    r->coeffs[8*i+0] =  (a[3*i+0] >> 0) & 7;
-    r->coeffs[8*i+1] =  (a[3*i+0] >> 3) & 7;
-    r->coeffs[8*i+2] = ((a[3*i+0] >> 6) | (a[3*i+1] << 2)) & 7;
-    r->coeffs[8*i+3] =  (a[3*i+1] >> 1) & 7;
-    r->coeffs[8*i+4] =  (a[3*i+1] >> 4) & 7;
-    r->coeffs[8*i+5] = ((a[3*i+1] >> 7) | (a[3*i+2] << 1)) & 7;
-    r->coeffs[8*i+6] =  (a[3*i+2] >> 2) & 7;
-    r->coeffs[8*i+7] =  (a[3*i+2] >> 5) & 7;
-
-    r->coeffs[8*i+0] = ETA - r->coeffs[8*i+0];
-    r->coeffs[8*i+1] = ETA - r->coeffs[8*i+1];
-    r->coeffs[8*i+2] = ETA - r->coeffs[8*i+2];
-    r->coeffs[8*i+3] = ETA - r->coeffs[8*i+3];
-    r->coeffs[8*i+4] = ETA - r->coeffs[8*i+4];
-    r->coeffs[8*i+5] = ETA - r->coeffs[8*i+5];
-    r->coeffs[8*i+6] = ETA - r->coeffs[8*i+6];
-    r->coeffs[8*i+7] = ETA - r->coeffs[8*i+7];
+   const __m512i mask_vec = _mm512_set1_epi16(7);
+   const __m512i eta_vec = _mm512_set1_epi16(2);
+  __m512i f0;
+  int pos = 0;
+  int ctr = 0;
+  for(int i = 0; i < 8; i ++)
+  {
+    f0 = _mm512_loadu_si512(a + pos);
+    f0 = _mm512_permutexvar_epi8(idx64, f0);
+    f0 = _mm512_srlv_epi16(f0, idx32);
+    f0 = _mm512_and_si512(f0, mask_vec);
+    f0 = _mm512_sub_epi16(eta_vec, f0);
+    _mm512_storeu_si512(r + ctr, f0);
+    pos += 12;
+    ctr += 32;
   }
-#elif ETA == 4
-  for(i = 0; i < N/2; ++i) {
-    r->coeffs[2*i+0] = a[i] & 0x0F;
-    r->coeffs[2*i+1] = a[i] >> 4;
-    r->coeffs[2*i+0] = ETA - r->coeffs[2*i+0];
-    r->coeffs[2*i+1] = ETA - r->coeffs[2*i+1];
+  for(int i = 0; i < N; i ++)
+  {
+    res->coeffs[i] = r[i];
   }
-#endif
-
-  DBENCH_STOP(*tpack);
 }
 
 /*************************************************
@@ -1101,7 +1046,6 @@ void polyz_pack(uint8_t *r, const poly *a) {
   uint32_t t[4];
   DBENCH_START();
 
-#if GAMMA1 == (1 << 17)
   for(i = 0; i < N/4; ++i) {
     t[0] = GAMMA1 - a->coeffs[4*i+0];
     t[1] = GAMMA1 - a->coeffs[4*i+1];
@@ -1121,19 +1065,6 @@ void polyz_pack(uint8_t *r, const poly *a) {
     r[9*i+7]  = t[3] >> 2;
     r[9*i+8]  = t[3] >> 10;
   }
-#elif GAMMA1 == (1 << 19)
-  for(i = 0; i < N/2; ++i) {
-    t[0] = GAMMA1 - a->coeffs[2*i+0];
-    t[1] = GAMMA1 - a->coeffs[2*i+1];
-
-    r[5*i+0]  = t[0];
-    r[5*i+1]  = t[0] >> 8;
-    r[5*i+2]  = t[0] >> 16;
-    r[5*i+2] |= t[1] << 4;
-    r[5*i+3]  = t[1] >> 4;
-    r[5*i+4]  = t[1] >> 12;
-  }
-#endif
 
   DBENCH_STOP(*tpack);
 }
@@ -1147,58 +1078,7 @@ void polyz_pack(uint8_t *r, const poly *a) {
 * Arguments:   - poly *r: pointer to output polynomial
 *              - const uint8_t *a: byte array with bit-packed polynomial
 **************************************************/
-// void polyz_unpack(poly *r, const uint8_t *a) {
-//   unsigned int i;
-//   DBENCH_START();
-
-// #if GAMMA1 == (1 << 17)
-//   for(i = 0; i < N/4; ++i) {
-//     r->coeffs[4*i+0]  = a[9*i+0];
-//     r->coeffs[4*i+0] |= (uint32_t)a[9*i+1] << 8;
-//     r->coeffs[4*i+0] |= (uint32_t)a[9*i+2] << 16;
-//     r->coeffs[4*i+0] &= 0x3FFFF;
-
-//     r->coeffs[4*i+1]  = a[9*i+2] >> 2;
-//     r->coeffs[4*i+1] |= (uint32_t)a[9*i+3] << 6;
-//     r->coeffs[4*i+1] |= (uint32_t)a[9*i+4] << 14;
-//     r->coeffs[4*i+1] &= 0x3FFFF;
-
-//     r->coeffs[4*i+2]  = a[9*i+4] >> 4;
-//     r->coeffs[4*i+2] |= (uint32_t)a[9*i+5] << 4;
-//     r->coeffs[4*i+2] |= (uint32_t)a[9*i+6] << 12;
-//     r->coeffs[4*i+2] &= 0x3FFFF;
-
-//     r->coeffs[4*i+3]  = a[9*i+6] >> 6;
-//     r->coeffs[4*i+3] |= (uint32_t)a[9*i+7] << 2;
-//     r->coeffs[4*i+3] |= (uint32_t)a[9*i+8] << 10;
-//     r->coeffs[4*i+3] &= 0x3FFFF;
-
-//     r->coeffs[4*i+0] = GAMMA1 - r->coeffs[4*i+0];
-//     r->coeffs[4*i+1] = GAMMA1 - r->coeffs[4*i+1];
-//     r->coeffs[4*i+2] = GAMMA1 - r->coeffs[4*i+2];
-//     r->coeffs[4*i+3] = GAMMA1 - r->coeffs[4*i+3];
-//   }
-// #elif GAMMA1 == (1 << 19)
-//   for(i = 0; i < N/2; ++i) {
-//     r->coeffs[2*i+0]  = a[5*i+0];
-//     r->coeffs[2*i+0] |= (uint32_t)a[5*i+1] << 8;
-//     r->coeffs[2*i+0] |= (uint32_t)a[5*i+2] << 16;
-//     r->coeffs[2*i+0] &= 0xFFFFF;
-
-//     r->coeffs[2*i+1]  = a[5*i+2] >> 4;
-//     r->coeffs[2*i+1] |= (uint32_t)a[5*i+3] << 4;
-//     r->coeffs[2*i+1] |= (uint32_t)a[5*i+4] << 12;
-//     r->coeffs[2*i+0] &= 0xFFFFF;
-
-//     r->coeffs[2*i+0] = GAMMA1 - r->coeffs[2*i+0];
-//     r->coeffs[2*i+1] = GAMMA1 - r->coeffs[2*i+1];
-//   }
-// #endif
-
-//   DBENCH_STOP(*tpack);
-// }
- #if GAMMA1 == (1 << 17)
- void polyz_unpack(poly * restrict r, const uint8_t *a) {
+void polyz_unpack(poly * restrict r, const uint8_t *a) {
   unsigned int i;
   __m512i f;
   const __m512i zero = _mm512_setzero_si512();
@@ -1227,37 +1107,7 @@ void polyz_pack(uint8_t *r, const poly *a) {
 
   DBENCH_STOP(*tpack);
 }
-#elif GAMMA1 == (1 << 19)
-void polyz_unpack(poly * restrict r, const uint8_t *a) {
-  unsigned int i;
-  __m512i f;
-  const __m512i zero = _mm512_setzero_si512();
-  const __m512i mask  = _mm512_set1_epi32(0xFFFFF);
-  const __m512i gamma1 = _mm512_set1_epi32(GAMMA1);
-  const __m512i idx8  = _mm512_set_epi8(48,39,38,37,48,37,36,35,
-                                        48,34,33,32,48,32,31,30,
-                                        48,29,28,27,48,27,26,25,
-                                        48,24,23,22,48,22,21,20,
-                                        48,19,18,17,48,17,16,15,
-                                        48,14,13,12,48,12,11,10,
-                                        48, 9, 8, 7,48, 7, 6, 5,
-                                        48, 4, 3, 2,48, 2, 1, 0);
-   const __m512i srlvdidx = _mm512_set_epi32(4,0,4,0,4,0,4,0,4,0,4,0,4,0,4,0);                                      
-  DBENCH_START();
 
-  for(i = 0; i < N/16; i++) {
-    f = _mm512_loadu_si512((__m512i *)&a[40*i]);
-    f = _mm512_mask_blend_epi64(0x1F, zero, f);
-    f = _mm512_permutexvar_epi8(idx8, f);
-    f = _mm512_srlv_epi32(f,srlvdidx);
-    f = _mm512_and_si512(f,mask);
-    f = _mm512_sub_epi32(gamma1,f);
-    _mm512_store_si512(&r->vec[i],f);
-  }
-
-  DBENCH_STOP(*tpack);
-}
- #endif
 /*************************************************
 * Name:        polyw1_pack
 *
@@ -1268,27 +1118,7 @@ void polyz_unpack(poly * restrict r, const uint8_t *a) {
 *                            POLYW1_PACKEDBYTES bytes
 *              - const poly *a: pointer to input polynomial
 **************************************************/
-// void polyw1_pack(uint8_t *r, const poly *a) {
-//   unsigned int i;
-//   DBENCH_START();
 
-// #if GAMMA2 == (Q-1)/88
-//   for(i = 0; i < N/4; ++i) {
-//     r[3*i+0]  = a->coeffs[4*i+0];
-//     r[3*i+0] |= a->coeffs[4*i+1] << 6;
-//     r[3*i+1]  = a->coeffs[4*i+1] >> 2;
-//     r[3*i+1] |= a->coeffs[4*i+2] << 4;
-//     r[3*i+2]  = a->coeffs[4*i+2] >> 4;
-//     r[3*i+2] |= a->coeffs[4*i+3] << 2;
-//   }
-// #elif GAMMA2 == (Q-1)/32
-//   for(i = 0; i < N/2; ++i)
-//     r[i] = a->coeffs[2*i+0] | (a->coeffs[2*i+1] << 4);
-// #endif
-
-//   DBENCH_STOP(*tpack);
-// }
-#if GAMMA2 == (Q-1)/88 //D2
 void polyw1_pack(uint8_t *r, const poly * restrict a) {
   unsigned int i;
   __m512i f0,f1,f2,f3;
@@ -1301,7 +1131,6 @@ void polyw1_pack(uint8_t *r, const poly * restrict a) {
   DBENCH_START();
 
   for(i = 0; i < N/64; i++) {
-    //load coeffs 换到round3 应是a->coeffs[64*i+0] a->coeffs[64*i+16] a->coeffs[64*i+32] a->coeffs[64*i+48]
     f0 = _mm512_load_si512((__m512i *)&a->vec[4*i+0]);
     f1 = _mm512_load_si512((__m512i *)&a->vec[4*i+1]);
     f2 = _mm512_load_si512((__m512i *)&a->vec[4*i+2]);
@@ -1317,43 +1146,3 @@ void polyw1_pack(uint8_t *r, const poly * restrict a) {
     _mm512_storeu_si512((__m512i *)&r[48*i],f0);
   }
 }
-//D3/D5  w1 with coefficients in [0,15] NIST KAT test right
-#elif GAMMA2 == (Q-1)/32
-void polyw1_pack(uint8_t * restrict r, const poly * restrict a) {
-  unsigned int i;
-  __m512i f0, f1, f2, f3, f4, f5, f6, f7;
-  const __m512i shift = _mm512_set1_epi16((16 << 8) + 1);
-  const __m512i shufbidx1 = _mm512_set_epi32(15,11,7,3,14,10,6,2,13,9,5,1,12,8,4,0);
-  const __m512i shufbidx = _mm512_set_epi8(15,14,11,10,7,6,3,2,13,12,9,8,5,4,1,0,
-                                           15,14,11,10,7,6,3,2,13,12,9,8,5,4,1,0,
-                                           15,14,11,10,7,6,3,2,13,12,9,8,5,4,1,0,
-                                           15,14,11,10,7,6,3,2,13,12,9,8,5,4,1,0);
-  DBENCH_START();
-
-  for(i = 0; i < N/128; ++i) {
-    //load coeffs 换到round3 应是a->coeffs[128*i+0] a->coeffs[128*i+16] a->coeffs[128*i+32] a->coeffs[128*i+48] a->coeffs[128*i+64] a->coeffs[128*i+80] a->coeffs[128*i+96] a->coeffs[128*i+112]
-    f0 = _mm512_loadu_si512(&a->coeffs[128*i+0]);
-    f1 = _mm512_loadu_si512(&a->coeffs[128*i+16]);
-    f2 = _mm512_loadu_si512(&a->coeffs[128*i+32]);
-    f3 = _mm512_loadu_si512(&a->coeffs[128*i+48]);
-    f4 = _mm512_loadu_si512(&a->coeffs[128*i+64]);
-    f5 = _mm512_loadu_si512(&a->coeffs[128*i+80]);
-    f6 = _mm512_loadu_si512(&a->coeffs[128*i+96]);
-    f7 = _mm512_loadu_si512(&a->coeffs[128*i+112]);
-    f0 = _mm512_packus_epi32(f0,f1);
-    f1 = _mm512_packus_epi32(f2,f3);
-    f2 = _mm512_packus_epi32(f4,f5);
-    f3 = _mm512_packus_epi32(f6,f7);
-    f0 = _mm512_packus_epi16(f0,f1);
-    f1 = _mm512_packus_epi16(f2,f3);
-    f0 = _mm512_maddubs_epi16(f0,shift);
-    f1 = _mm512_maddubs_epi16(f1,shift);
-    f0 = _mm512_packus_epi16(f0,f1);
-    f0 = _mm512_permutexvar_epi32(shufbidx1,f0);
-    f0 = _mm512_shuffle_epi8(f0,shufbidx);
-    _mm512_storeu_si512(&r[64*i], f0);
-  }
-
-  DBENCH_STOP(*tpack);
-}
-#endif

@@ -6,13 +6,14 @@
 #include "cpucycles.h"
 #include "speed_print.h"
 #include "../mult.h"
+#include "../rejsample.h"
 #define NTESTS 100000
 
 uint64_t t[NTESTS];
 
 int main(void)
 {
-  unsigned int i;
+    unsigned int i;
   size_t smlen;
   uint8_t pk[CRYPTO_PUBLICKEYBYTES];
   uint8_t sk[CRYPTO_SECRETKEYBYTES];

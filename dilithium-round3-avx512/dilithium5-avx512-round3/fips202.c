@@ -49,10 +49,10 @@ static void store64(uint8_t x[8], uint64_t u) {
 /* Keccak round constants */
 static const uint64_t KeccakF_RoundConstants[NROUNDS] = {
   (uint64_t)0x0000000000000001ULL,
-  (uint64_t)0x0000000000008082ULL, 
+  (uint64_t)0x0000000000008082ULL,
   (uint64_t)0x800000000000808aULL,
   (uint64_t)0x8000000080008000ULL,
-  (uint64_t)0x000000000000808bULL, 
+  (uint64_t)0x000000000000808bULL,
   (uint64_t)0x0000000080000001ULL,
   (uint64_t)0x8000000080008081ULL,
   (uint64_t)0x8000000000008009ULL,
@@ -778,10 +778,8 @@ static void keccak_absorb_once_avx512seq(__m512i state[5],
                                size_t inlen,
                                uint8_t p)
 {
-  // printf("inlen:%d\n",inlen);
   size_t i, j;
   int reslen = inlen % r;
-  //设置state为全0
   for(i = 0; i < 5; i ++)
   {
     state[i] = _mm512_setzero_si512();
@@ -796,27 +794,20 @@ static void keccak_absorb_once_avx512seq(__m512i state[5],
     state[3] = _mm512_xor_si512(state[3],_mm512_maskz_loadu_epi64(0x03,(__m512i*)in));	
     in += 16;
     inlen -= r;
-    keccakF(state, 24);
+    keccakF(state, 24);    
   }
   size_t count;
-  count = inlen/40;//一个寄存器一个寄存器进行异或
-  // printf("count1:%d\n",count);
+  count = inlen/40;
   for(j = 0; j < count; j ++)
   { 
     state[j] = _mm512_xor_si512(state[j],_mm512_maskz_loadu_epi64(0x01F,(__m512i*)in));	
-    //往前挪40个字节
     in += 40;
-    //跳过三个
     inlen -= 40;
     
   }
-  // printf("inlen:%d\n",inlen);
   int pos = count*8;
-  // printf("pos:%d\n",pos);
-  count = inlen/8;//看看有多少个8字节
-   unsigned long long *ss = (unsigned long long *)state;
-  //处理剩下的，肯定是小于40字节，一个向量寄存器就可以
-  // printf("count2:%d\n",count);
+  count = inlen/8;
+  unsigned long long *ss = (unsigned long long *)state;
   for(i=0;i<count;i++)
   {
     ss[pos] ^= load64(in);
@@ -824,7 +815,6 @@ static void keccak_absorb_once_avx512seq(__m512i state[5],
     inlen -= 8;
     in += 8;
   }
-  //剩下的字节
   for(i=0;i<inlen;i++)
   {
     ss[pos] ^= (uint64_t)in[i] << 8*i;
@@ -839,18 +829,11 @@ static void keccak_squeeze_avx512seq(uint8_t *out,
 {
   size_t i, j;
   size_t count  = outlen/40;
-  //最后剩下的不够一个block
-  // while(outlen) {
-    //这个判断不需要，因为上一次是squeeze blocks，并且这个squeeze也只调用一次，所以下次一定是pos==r
-    // if(pos == r) {
-      // KeccakF1600_StatePermute(s);
   keccakF(state, 24);
   for(j = 0; j < count; j ++)
   { 
     _mm512_mask_storeu_epi64((__m512*)out,0x1F,state[j]);
-    //往前挪40个字节
     out += 40;
-    //跳过三个
     outlen -= 40;
   }
   unsigned long long *ss = (unsigned long long *)state;
@@ -863,7 +846,6 @@ static void keccak_squeeze_avx512seq(uint8_t *out,
     outlen -= 8;
     out += 8;
   }
-  //处理剩下字节
   for(i = 0; i < outlen; i ++)
   {
     *out++ = ss[pos] >> 8*i;
@@ -874,23 +856,9 @@ void shake256_avx512seq(uint8_t *out, size_t outlen, const uint8_t *in, size_t i
 {
   size_t nblocks;
   __m512i state[5];
-  // uint64_t state2[25];
-  //init state
   shake256_absorb_once_avx512seq(state, in, inlen);
   nblocks = outlen/SHAKE256_RATE;
-  // printf("nblocks:%d,\n",nblocks);
-  // shake256_squeezeblocks_avx512seq(out, nblocks, state);
-  // _mm512_mask_storeu_epi64((__m512*)&state2[0],0x1F,state[0]);
-  // _mm512_mask_storeu_epi64((__m512*)&state2[5],0x1F,state[1]);
-  // _mm512_mask_storeu_epi64((__m512*)&state2[10],0x1F,state[2]);
-  // _mm512_mask_storeu_epi64((__m512*)&state2[15],0x1F,state[3]);
-  // _mm512_mask_storeu_epi64((__m512*)&state2[20],0x1F,state[4]);
-  //  printf("shake256 avx512seq\n");
-  // for(int i = 0; i < 25; i ++)
-  // {
-  //   printf("%d, ", state2[i]);
-  // }
-  // printf("\n");
+ 
   outlen -= nblocks*SHAKE256_RATE;
   out += nblocks*SHAKE256_RATE;
   shake256_squeeze_avx512seq(out, outlen, state);

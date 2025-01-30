@@ -1,0 +1,8 @@
+poly eta unpack:
+median: 104 cycles/ticks
+average: 113 cycles/ticks
+
+poly eta unpack opt: 
+median: 84 cycles/ticks
+average: 86 cycles/ticks
+

@@ -69,7 +69,6 @@ int32_t decompose(int32_t *a0, int32_t a) {
   return a1;
 }
 
-#if GAMMA2 == (Q-1)/32
 void decompose_avx(__m512i *a1, __m512i *a0, const __m512i *a)
 {
   unsigned int i;
@@ -101,44 +100,6 @@ void decompose_avx(__m512i *a1, __m512i *a0, const __m512i *a)
   }
 }
 
-#elif GAMMA2 == (Q-1)/88
-void decompose_avx(__m512i *a1, __m512i *a0, const __m512i *a)
-{
-  unsigned int i;
-  __m512i f,f0,f1,f2,t,g2;
-  __mmask16 good0;
-  const __m512i q = _mm512_set1_epi32(Q);
-  const __m512i zero = _mm512_setzero_si512();
-  const __m512i v = _mm512_set1_epi32(11275);
-  const __m512i v2 = _mm512_set1_epi32(44);
-  const __m512i alpha = _mm512_set1_epi32(2*GAMMA2);
-  const __m512i off = _mm512_set1_epi32(127);
-  const __m512i max = _mm512_set1_epi32(43);
-  const __m512i shift2 = _mm512_set1_epi32(8388608);
-  const __m512i qsubone = _mm512_set1_epi32(4190208);
-  for(i=0;i<N/16;i++) {
-    f = _mm512_load_si512(&a[i]);
-    f1 = _mm512_add_epi32(f,off);
-    f1 = _mm512_srli_epi32(f1,7);
-    f1 = _mm512_mullo_epi32(f1,v);
-    f1 = _mm512_add_epi32(f1,shift2);
-    f1 = _mm512_srli_epi32(f1,24);
-    t = _mm512_sub_epi32(max,f1);
-    t = _mm512_srli_epi32(t,31);
-    t = _mm512_and_epi32(t,f1);
-    f2 = _mm512_xor_epi32(t,f1);
-    good0 = _mm512_cmp_epi32_mask(f2, v2, 0);
-    f2 = _mm512_mask_blend_epi32(good0, f2, zero);
-    f0 = _mm512_mullo_epi32(f2,alpha);
-    f0 = _mm512_sub_epi32(f,f0);
-    good0 = _mm512_cmp_epi32_mask(f0, qsubone, 6);
-    g2 = _mm512_mask_blend_epi32(good0, zero, q);
-    f0 = _mm512_sub_epi32(f0,g2);
-    _mm512_store_si512(&a1[i],f2);
-    _mm512_store_si512(&a0[i],f0);
-  }
-}
-#endif
 /*************************************************
 * Name:        make_hint
 *
@@ -157,34 +118,32 @@ unsigned int make_hint(int32_t a0, int32_t a1) {
 
   return 1;
 }
-unsigned int make_hint_avx(__m512i * restrict hint, const __m512i * restrict a0, const __m512i * restrict a1)
+unsigned int make_hint_avx(int32_t * restrict h, const int32_t * restrict a0, const int32_t * restrict a1)
 {
   unsigned int i, n = 0;
-  __m512i f0, f1, g0, g1, g2, g3, g4;
+  __m512i f0, f1;
+  __mmask16 g0, g1, g2;
   const __m512i one = _mm512_set1_epi32(1);
-  const __m512i bound1 = _mm512_set1_epi32(GAMMA2);
-  const __m512i bound2 = _mm512_set1_epi32(-GAMMA2);
+  const __m512i bound1 = _mm512_set1_epi32(GAMMA2+1);
+  const __m512i bound2 = _mm512_set1_epi32(Q-GAMMA2);
   const __m512i zero = _mm512_setzero_si512();
-  __mmask16 good0, good1, good2, good3, good4;
   for(i = 0; i < N/16; ++i) {
-    f0 = _mm512_load_si512(&a0[i]);
-    f1 = _mm512_load_si512(&a1[i]);
-    good0 = _mm512_cmp_epi32_mask(f0, bound1, 6);
-    g0 = _mm512_mask_blend_epi32(good0, zero, one);
-    good1 = _mm512_cmp_epi32_mask(f0, bound2, 1);
-    g1 = _mm512_mask_blend_epi32(good1, zero, one);
-    good2 = _mm512_cmp_epi32_mask(f0, bound2, 0);
-    g2 = _mm512_mask_blend_epi32(good2, zero, one);
-    good3 = _mm512_cmp_epi32_mask(f1, zero, 4);
-    g3 = _mm512_mask_blend_epi32(good3, zero, one);
-    g3 = _mm512_and_si512(g2, g3);
-    g4 = _mm512_or_si512(g0, g1);
-    g4 = _mm512_or_si512(g4, g3);
-    good4 = _mm512_cmp_epi32_mask(g4, one, 0);
-    _mm512_store_si512(&hint[i],g4);
-    n += _mm_popcnt_u32((uint16_t)good4);
+    f0 = _mm512_load_si512((__m512i *)&a0[16*i]);
+    f1 = _mm512_load_si512((__m512i *)&a1[16*i]);
+
+    g0 = _mm512_cmpgt_epi32_mask(bound1,f0);
+    g1 = _mm512_cmpgt_epi32_mask(f0,bound2);
+
+    g0 |= g1;
+    g1 = _mm512_cmpeq_epi32_mask(f0,bound2);
+    g2 = _mm512_cmpeq_epi32_mask(f1,zero);
+    g1 &= g2;
+    g0 |= g1;
+    n += _mm_popcnt_u32(g0);
+    f0 = _mm512_mask_set1_epi32(one, g0, 0);
+    _mm512_store_si512((__m512i *)&h[16*i],f0);
   }
-  return n;
+  return N - n;
 }
 /*************************************************
 * Name:        use_hint
